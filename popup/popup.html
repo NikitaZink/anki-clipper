@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Anki Clipper</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+<div class="popup-container">
+
+  <!-- ── IDLE VIEW ── -->
+  <div id="view-idle" class="view">
+    <div class="header">
+      <div>
+        <h1>Anki Clipper</h1>
+        <div class="deck-row">
+          <span class="subtitle" id="deck-subtitle">Колода: Default</span>
+          <button class="btn-deck-pick" id="btn-deck-pick" title="Выбрать колоду">▾</button>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="btn-icon" id="btn-history" title="История сессий">⟳</button>
+        <button class="btn-icon" id="btn-options" title="Настройки">⚙</button>
+      </div>
+    </div>
+    <div id="deck-picker-wrap" class="deck-picker-wrap hidden">
+      <select id="deck-picker-select" class="deck-picker-select" size="6"></select>
+      <div class="deck-picker-status" id="deck-picker-status"></div>
+    </div>
+    <div class="quick-settings-row">
+      <div class="provider-toggle">
+        <button class="provider-btn" data-provider="groq">Groq</button>
+        <button class="provider-btn" data-provider="ollama">Ollama</button>
+        <button class="provider-btn" data-provider="openai">OpenAI</button>
+      </div>
+    </div>
+    <div class="conn-row" id="conn-row">
+      <div class="conn-item">
+        <span class="conn-dot" id="dot-anki"></span>
+        <span class="conn-label" id="label-anki">AnkiConnect</span>
+      </div>
+      <div class="conn-item">
+        <span class="conn-dot" id="dot-ai"></span>
+        <span class="conn-label" id="label-ai">AI</span>
+      </div>
+    </div>
+    <div id="idle-warning" class="inline-warning hidden"></div>
+    <button class="btn btn-primary" id="btn-grab" data-i18n="btn_grab">
+      📋 Взять из буфера обмена
+    </button>
+  </div>
+
+  <!-- ── HISTORY VIEW ── -->
+  <div id="view-history" class="view hidden">
+    <div class="header">
+      <div>
+        <h1 data-i18n="history_title">История сессий</h1>
+      </div>
+      <button class="btn-icon" id="btn-history-back">✕</button>
+    </div>
+    <div id="history-list" class="history-list"></div>
+    <div id="history-empty" class="history-empty hidden" data-i18n="history_empty">
+      Нет сохранённых сессий
+    </div>
+  </div>
+
+  <!-- ── TEXT EDITOR VIEW ── -->
+  <div id="view-text" class="view hidden">
+    <div class="header">
+      <div>
+        <h1 data-i18n="text_title">Текст из буфера</h1>
+        <div class="subtitle" data-i18n="text_subtitle">Отредактируйте перед анализом</div>
+      </div>
+      <span class="char-count" id="text-char-count">0 симв.</span>
+    </div>
+    <div class="mode-toggle">
+      <button class="mode-btn active" data-mode="definitions" data-i18n="mode_definitions">
+        📖 Определения
+      </button>
+      <button class="mode-btn" data-mode="questions" data-i18n="mode_questions">
+        ❓ Вопросы
+      </button>
+    </div>
+    <div class="mode-hint" id="mode-hint" data-i18n="hint_definitions">
+      Термины, функции, формулы → подробные определения из текста
+    </div>
+    <div id="text-length-warning" class="inline-warning hidden"></div>
+    <textarea
+      class="text-editor"
+      id="text-editor"
+      data-i18n-placeholder="text_placeholder"
+      placeholder="Текст для анализа..."
+      spellcheck="false"
+    ></textarea>
+    <div class="cards-footer">
+      <button class="btn btn-primary" id="btn-analyze" data-i18n="btn_analyze">✨ Анализировать</button>
+      <button class="btn btn-secondary" id="btn-text-back" data-i18n="btn_back">← Назад</button>
+    </div>
+  </div>
+
+  <!-- ── GENERATION SETTINGS VIEW ── -->
+  <div id="view-slider" class="view hidden">
+    <div class="header">
+      <div>
+        <h1 data-i18n="gen_title">Настройки генерации</h1>
+        <div class="subtitle" id="slider-range-label">от — до —</div>
+      </div>
+    </div>
+
+    <div class="gen-section">
+      <div class="gen-section-header">
+        <span class="gen-section-label" data-i18n="slider_title">Количество карточек</span>
+        <span class="gen-count-badge" id="slider-count-num">10</span>
+      </div>
+      <input type="range" class="card-slider" id="card-count-slider" min="1" max="30" value="10" />
+      <div class="slider-edge-labels">
+        <span id="slider-min-label"></span>
+        <span id="slider-max-label"></span>
+      </div>
+    </div>
+
+    <div class="gen-section">
+      <div class="gen-section-header">
+        <span class="gen-section-label" data-i18n="detail_level_label">Подробность ответов</span>
+        <span class="gen-count-badge" id="detail-level-badge">Стандарт</span>
+      </div>
+      <input type="range" class="card-slider" id="detail-level-slider" min="1" max="5" value="3" step="1" />
+      <div class="slider-edge-labels">
+        <span data-i18n="detail_brief_short">Кратко</span>
+        <span data-i18n="detail_detailed_short">Подробно</span>
+      </div>
+    </div>
+
+    <label class="enhance-row">
+      <div class="enhance-info">
+        <span class="enhance-title" data-i18n="enhance_title">AI улучшение</span>
+        <span class="enhance-desc" data-i18n="enhance_desc">Нейросеть дополнит карточки из своих знаний</span>
+      </div>
+      <input type="checkbox" class="enhance-chk" id="chk-enhance" />
+    </label>
+
+    <label class="enhance-row" for="chk-styled">
+      <div class="enhance-info">
+        <span class="enhance-title" data-i18n="styled_label">✨ Стилизировать</span>
+        <span class="enhance-desc">Форматирование с HTML-разметкой в Anki</span>
+      </div>
+      <input type="checkbox" class="enhance-chk" id="chk-styled" />
+    </label>
+
+    <div class="gen-section">
+      <div class="gen-section-header">
+        <span class="gen-section-label">Язык карточек</span>
+      </div>
+      <div class="lang-toggle" id="lang-toggle">
+        <button class="lang-btn active" data-lang="auto">Авто</button>
+        <button class="lang-btn" data-lang="ru">Русский</button>
+        <button class="lang-btn" data-lang="en">English</button>
+      </div>
+    </div>
+
+    <div class="gen-section">
+      <div class="gen-section-header">
+        <span class="gen-section-label" data-i18n="tags_label">Теги Anki</span>
+        <button class="btn-tag-suggest" id="btn-suggest-tags" data-i18n="btn_suggest_tags">✨ Подобрать</button>
+      </div>
+      <input type="text" class="tags-input" id="tags-input" placeholder="тег1 тег2 тег3" />
+      <div id="tag-chips-wrap" class="tag-chips-wrap hidden"></div>
+      <div class="slider-edge-labels">
+        <span data-i18n="tags_hint">Через пробел, добавятся ко всем карточкам</span>
+      </div>
+    </div>
+
+    <div class="cards-footer">
+      <button class="btn btn-primary" id="btn-generate" data-i18n="btn_generate">✨ Сгенерировать</button>
+      <button class="btn btn-secondary" id="btn-slider-back" data-i18n="btn_change_text">← Изменить текст</button>
+    </div>
+  </div>
+
+  <!-- ── LOADING VIEW ── -->
+  <div id="view-loading" class="view hidden">
+    <div class="header">
+      <h1>Anki Clipper</h1>
+    </div>
+    <div class="loading-wrap">
+      <div class="spinner"></div>
+      <div class="loading-text" id="loading-text">Анализирую текст...</div>
+      <div class="loading-hint" id="loading-hint"></div>
+    </div>
+  </div>
+
+  <!-- ── CARDS VIEW ── -->
+  <div id="view-cards" class="view hidden">
+    <div class="header">
+      <div class="cards-header-left">
+        <span id="cards-count-label">Найдено карточек: 0</span>
+        <button class="btn-undo" id="btn-undo" title="Отменить (Ctrl+Z)" disabled>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 00-9-9 9 9 0 00-6 2.3L3 13"/></svg>
+        </button>
+        <button class="btn-toggle-backs" id="btn-toggle-backs" title="Скрыть ответы">
+          <svg class="icon-backs-on" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          <svg class="icon-backs-off" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+        </button>
+      </div>
+      <label class="select-all-wrap">
+        <input type="checkbox" id="chk-select-all" checked />
+        <span data-i18n="select_all">Выбрать все</span>
+      </label>
+    </div>
+
+    <input type="text" class="card-filter-input" id="card-filter-input" data-i18n-placeholder="filter_placeholder" placeholder="Поиск по карточкам..." />
+
+    <div class="cards-list" id="cards-list"></div>
+
+    <div id="streaming-bar" class="streaming-bar hidden">
+      <span class="streaming-dot"></span>
+      <span id="streaming-bar-text" data-i18n="streaming_text">Генерирую карточки...</span>
+    </div>
+
+    <div class="cards-footer">
+      <div class="deck-row-cards">
+        <span class="subtitle" id="deck-subtitle-cards">Колода: Default</span>
+        <button class="btn-deck-pick" id="btn-deck-pick-cards" title="Выбрать колоду">▾</button>
+      </div>
+      <div id="deck-picker-wrap-cards" class="deck-picker-wrap hidden">
+        <select id="deck-picker-select-cards" class="deck-picker-select" size="6"></select>
+        <div class="deck-picker-status" id="deck-picker-status-cards"></div>
+      </div>
+      <div id="cards-error" class="inline-error hidden"></div>
+      <button class="btn btn-primary" id="btn-add-anki" disabled>
+        Добавить выбранные (0)
+      </button>
+      <div class="footer-row">
+        <button class="btn btn-secondary" id="btn-download" data-i18n="btn_download">⬇ Скачать</button>
+        <button class="btn btn-secondary" id="btn-restart" data-i18n="btn_restart">↺ Сначала</button>
+        <button class="btn btn-secondary" id="btn-back" data-i18n="btn_back">← Назад</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SUCCESS VIEW ── -->
+  <div id="view-success" class="view hidden">
+    <div class="success-wrap">
+      <div class="success-icon">✓</div>
+      <div>
+        <div class="success-text" id="success-text">Добавлено 0 карточек</div>
+        <div class="success-sub" id="success-sub"></div>
+      </div>
+      <button class="btn btn-primary" id="btn-again" data-i18n="btn_again" style="width:auto;padding:8px 24px;">
+        Ещё
+      </button>
+    </div>
+  </div>
+
+  <!-- ── ERROR VIEW ── -->
+  <div id="view-error" class="view hidden">
+    <div class="header">
+      <h1>Anki Clipper</h1>
+    </div>
+    <div class="inline-error" id="error-message">
+      <div id="error-text"></div>
+      <pre id="error-raw" class="hidden"></pre>
+    </div>
+    <div style="margin-top:10px;display:flex;gap:8px;">
+      <button class="btn btn-primary" id="btn-retry" data-i18n="btn_retry" style="flex:1;">Повторить</button>
+      <button class="btn btn-secondary" id="btn-error-back" data-i18n="btn_back" style="flex:1;">← Назад</button>
+    </div>
+  </div>
+
+  <!-- ── CARD FLIP MODAL ── -->
+  <div id="flip-modal" class="flip-modal hidden">
+    <div class="flip-backdrop" id="flip-backdrop"></div>
+    <div class="flip-card-preview">
+      <div class="flip-front" id="flip-front"></div>
+      <div class="flip-sep" data-i18n="card_divider">Ответ</div>
+      <div class="flip-back" id="flip-back"></div>
+      <button class="btn btn-secondary flip-close-btn" id="btn-flip-close" data-i18n="btn_close">Закрыть</button>
+    </div>
+  </div>
+
+</div>
+<script src="popup.js"></script>
+</body>
+</html>

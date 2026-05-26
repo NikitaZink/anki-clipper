@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Anki Clipper — Настройки</title>
+  <link rel="stylesheet" href="options.css" />
+</head>
+<body>
+<div class="page">
+  <div class="page-header">
+    <div class="page-header-inner">
+      <img class="app-icon" src="../icons/icon48.png" alt="Anki Clipper" />
+      <div>
+        <h1>Anki Clipper</h1>
+        <div class="page-subtitle" data-i18n="page_subtitle">Настройки расширения</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI Provider -->
+  <div class="section">
+    <div class="section-title" data-i18n="section_ai">AI-провайдер</div>
+
+    <div class="field">
+      <div class="radio-group">
+        <label class="radio-label">
+          <input type="radio" name="provider" value="groq" id="radio-groq" />
+          <span data-i18n="lbl_groq">Groq</span>
+        </label>
+        <label class="radio-label">
+          <input type="radio" name="provider" value="ollama" id="radio-ollama" />
+          <span data-i18n="lbl_ollama">Ollama</span>
+        </label>
+        <label class="radio-label">
+          <input type="radio" name="provider" value="openai" id="radio-openai" />
+          <span data-i18n="lbl_openai">OpenAI</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Groq fields -->
+    <div id="groq-fields" class="conditional">
+      <div class="field">
+        <label for="groq-key" data-i18n="lbl_groq_key">API-ключ Groq</label>
+        <input type="password" id="groq-key" placeholder="gsk_..." autocomplete="off" />
+        <div class="hint" data-i18n="hint_groq_key">Получить ключ: console.groq.com → API Keys</div>
+      </div>
+      <div class="field">
+        <label for="groq-model-select" data-i18n="lbl_model">Модель</label>
+        <select id="groq-model-select" class="loader-select"></select>
+        <input type="text" id="groq-model-custom" class="hidden" placeholder="model-id" />
+        <input type="hidden" id="groq-model" />
+        <div class="hint" id="groq-model-hint"></div>
+      </div>
+    </div>
+
+    <!-- Ollama fields -->
+    <div id="ollama-fields" class="conditional hidden">
+      <div class="field">
+        <label for="ollama-endpoint" data-i18n="lbl_ollama_ep">Адрес Ollama</label>
+        <input type="text" id="ollama-endpoint" placeholder="http://localhost:11434" />
+      </div>
+      <div class="field">
+        <label for="ollama-model" data-i18n="lbl_model">Модель</label>
+        <div class="field-row">
+          <input type="text" id="ollama-model" placeholder="qwen2.5:14b" />
+          <button type="button" id="btn-load-models" class="btn-load" data-i18n="btn_load_models">↓ Загрузить</button>
+        </div>
+        <select id="model-select" class="loader-select hidden"></select>
+        <div class="status-line" id="model-status"></div>
+      </div>
+    </div>
+
+    <!-- OpenAI-compatible fields -->
+    <div id="openai-fields" class="conditional hidden">
+      <div class="field">
+        <label for="openai-endpoint" data-i18n="lbl_openai_ep">Endpoint</label>
+        <input type="text" id="openai-endpoint" placeholder="https://api.openai.com" />
+        <div class="hint" data-i18n="hint_openai_ep">Совместим с OpenAI, OpenRouter, LM Studio, Jan и другими</div>
+      </div>
+      <div class="field">
+        <label for="openai-key" data-i18n="lbl_openai_key">API-ключ</label>
+        <input type="password" id="openai-key" placeholder="sk-..." autocomplete="off" />
+      </div>
+      <div class="field">
+        <label for="openai-model" data-i18n="lbl_model">Модель</label>
+        <input type="text" id="openai-model" placeholder="gpt-4o-mini" />
+        <div class="hint" data-i18n="hint_openai_model">Например: gpt-4o-mini, gpt-4o, claude-3-haiku, mistral-small</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Anki -->
+  <div class="section">
+    <div class="section-title">Anki</div>
+    <div class="field">
+      <label for="anki-deck" data-i18n="lbl_anki_deck">Название колоды</label>
+      <div class="field-row">
+        <input type="text" id="anki-deck" placeholder="Default" />
+        <button type="button" id="btn-load-decks" class="btn-load" data-i18n="btn_load_decks">↓ Из Anki</button>
+      </div>
+      <select id="deck-select" class="loader-select hidden"></select>
+      <div class="status-line" id="deck-status"></div>
+      <div class="hint" data-i18n="hint_anki_deck">Введите вручную или загрузите список из запущенной Anki</div>
+    </div>
+    <div class="field">
+      <label for="input-default-tags" data-i18n="lbl_default_tags">Теги по умолчанию</label>
+      <input type="text" id="input-default-tags" placeholder="python programming" />
+      <div class="hint" data-i18n="hint_default_tags">Добавляются ко всем карточкам (через пробел)</div>
+    </div>
+  </div>
+
+  <!-- Advanced -->
+  <div class="section">
+    <div class="section-title" data-i18n="section_advanced">Дополнительно</div>
+    <div class="field">
+      <label for="input-custom-prompt" data-i18n="lbl_custom_prompt">Дополнение к промпту</label>
+      <textarea class="opt-textarea" id="input-custom-prompt" placeholder="Например: всегда давай примеры кода на Python"></textarea>
+      <div class="hint" data-i18n="hint_custom_prompt">Добавляется в конец всех промптов генерации карточек</div>
+    </div>
+  </div>
+
+  <!-- UI Language -->
+  <div class="section">
+    <div class="section-title" data-i18n="section_lang">Язык интерфейса</div>
+    <div class="field">
+      <div class="radio-group">
+        <label class="radio-label">
+          <input type="radio" name="ui_language" value="ru" id="radio-ru" />
+          <span>Русский</span>
+        </label>
+        <label class="radio-label">
+          <input type="radio" name="ui_language" value="en" id="radio-en" />
+          <span>English</span>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn-save" id="btn-save">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+    <span data-i18n="btn_save">Сохранить настройки</span>
+  </button>
+  <div class="save-ok invisible" id="save-ok">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+    <span data-i18n="save_ok">Настройки сохранены</span>
+  </div>
+</div>
+<script src="options.js"></script>
+</body>
+</html>
