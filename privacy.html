@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Политика конфиденциальности — Anki Clipper</title>
+  <meta name="description" content="Политика конфиденциальности расширения Anki Clipper." />
+  <link rel="icon" href="icons/icon128.png?v=2" type="image/png" />
+  <style>
+    :root {
+      --bg: #0d0b1e;
+      --panel: #15112b;
+      --text: #f7f4ff;
+      --muted: rgba(247, 244, 255, 0.72);
+      --line: rgba(168, 85, 247, 0.22);
+      --accent: #a855f7;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at 70% 0%, rgba(124, 58, 237, 0.26), transparent 42%), var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+    }
+
+    main {
+      width: min(860px, calc(100% - 40px));
+      margin: 0 auto;
+      padding: 56px 0 72px;
+    }
+
+    .back {
+      display: inline-flex;
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 700;
+      margin-bottom: 32px;
+    }
+
+    article {
+      background: rgba(21, 17, 43, 0.82);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: clamp(24px, 5vw, 48px);
+      box-shadow: 0 24px 90px rgba(0, 0, 0, 0.28);
+    }
+
+    h1 {
+      margin: 0 0 12px;
+      font-size: clamp(32px, 5vw, 48px);
+      line-height: 1.08;
+    }
+
+    h2 {
+      margin: 34px 0 12px;
+      font-size: 22px;
+      line-height: 1.25;
+    }
+
+    p, li { color: var(--muted); }
+
+    ul { padding-left: 22px; }
+
+    a { color: var(--accent); }
+
+    .updated {
+      margin: 0 0 30px;
+      color: rgba(247, 244, 255, 0.52);
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <a class="back" href="./">← На главную</a>
+
+    <article>
+      <h1>Политика конфиденциальности</h1>
+      <p class="updated">Дата обновления: 26 мая 2026 года</p>
+
+      <p>
+        Anki Clipper — браузерное расширение для создания карточек Anki из текста. Эта политика объясняет,
+        какие данные использует расширение и куда они могут передаваться.
+      </p>
+
+      <h2>Какие данные использует расширение</h2>
+      <ul>
+        <li>Текст, который пользователь вручную копирует в буфер обмена и затем отправляет на обработку в расширении.</li>
+        <li>Сгенерированные карточки, история сессий и пользовательские настройки.</li>
+        <li>API-ключи и адреса выбранных AI-провайдеров, если пользователь сохраняет их в настройках расширения.</li>
+        <li>Название выбранной колоды Anki и технические данные, необходимые для подключения к AnkiConnect.</li>
+      </ul>
+
+      <h2>Как используются данные</h2>
+      <p>
+        Данные используются только для основных функций расширения: анализа текста, генерации карточек,
+        редактирования результата и отправки карточек в локальное приложение Anki через AnkiConnect.
+      </p>
+
+      <h2>Передача данных третьим лицам</h2>
+      <p>
+        Разработчик расширения не продает пользовательские данные и не передает их для рекламы, кредитования
+        или иных целей, не связанных с работой расширения.
+      </p>
+      <p>
+        Если пользователь выбирает облачный AI-провайдер, например Groq или OpenAI-совместимый API,
+        выбранный текст и служебный запрос отправляются этому провайдеру для генерации карточек.
+        Обработка таких данных регулируется политикой конфиденциальности выбранного провайдера.
+      </p>
+      <p>
+        Если пользователь выбирает Ollama, обработка выполняется на локальном адресе, указанном в настройках.
+        Данные также могут отправляться на локальный AnkiConnect по адресу <code>http://localhost:8765</code>
+        для добавления карточек в Anki.
+      </p>
+
+      <h2>Хранение данных</h2>
+      <p>
+        Настройки расширения и API-ключи сохраняются средствами Chrome Storage. История сессий и временные данные
+        сохраняются локально в браузере пользователя. Разработчик не имеет доступа к этим данным.
+      </p>
+
+      <h2>Удаление данных</h2>
+      <p>
+        Пользователь может удалить данные расширения, очистив историю внутри расширения, изменив настройки,
+        удалив API-ключи или удалив расширение из браузера.
+      </p>
+
+      <h2>Контакты</h2>
+      <p>
+        По вопросам конфиденциальности можно связаться с разработчиком через профиль GitHub:
+        <a href="https://github.com/nikitazink">github.com/nikitazink</a>.
+      </p>
+    </article>
+  </main>
+</body>
+</html>
